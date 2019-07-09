@@ -1,0 +1,8 @@
+Exam AZ-203: Developing Solutions for Microsoft Azure
+https://www.microsoft.com/en-us/learning/exam-az-203.aspx
+
+Learning path for Azure Developer
+https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWtQqM
+
+Azure fundamentals
+https://docs.microsoft.com/en-us/learn/paths/azure-fundamentals/

@@ -1,0 +1,408 @@
+Type "az" to use Azure CLI
+Type "help" to learn about Cloud Shell
+
+sachin@Azure:~$ USERNAME=azureuser
+sachin@Azure:~$ PASSWORD=$(openssl rand -base64 32)
+sachin@Azure:~$ az vm create \
+>   --name myVM \
+>   --resource-group Learn-87a26c67-081a-4a3b-942c-c301adad1e94 \
+>   --image Win2019Datacenter \
+>   --size Standard_DS2_v2 \
+>   --location eastus \
+>   --admin-username $USERNAME \
+>   --admin-password $PASSWORD
+{
+  "fqdns": "",
+  "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Compute/virtualMachines/myVM",
+  "location": "eastus",
+  "macAddress": "00-0D-3A-1B-49-CF",
+  "powerState": "VM running",
+  "privateIpAddress": "10.0.0.4",
+  "publicIpAddress": "138.91.125.212",
+  "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+  "zones": ""
+}
+sachin@Azure:~$ az vm get-instance-view \
+>   --name myVM \
+>   --resource-group Learn-87a26c67-081a-4a3b-942c-c301adad1e94 \
+>   --output table
+Name    ResourceGroup                               Location    ProvisioningState    PowerState
+------  ------------------------------------------  ----------  -------------------  ------------
+myVM    Learn-87a26c67-081a-4a3b-942c-c301adad1e94  eastus      Succeeded            VM running
+sachin@Azure:~$
+
+sachin@Azure:~$ az vm extension set \
+>   --resource-group Learn-87a26c67-081a-4a3b-942c-c301adad1e94 \
+>   --vm-name myVM \
+>   --name CustomScriptExtension \
+>   --publisher Microsoft.Compute \
+>   --settings "{'fileUris':['https://raw.githubusercontent.com/MicrosoftDocs/mslearn-welcome-to-azure/master/configure-iis.ps1']}" \
+>   --protected-settings "{'commandToExecute': 'powershell -ExecutionPolicy Unrestricted -File configure-iis.ps1'}"
+{
+  "autoUpgradeMinorVersion": true,
+  "forceUpdateTag": null,
+  "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Compute/virtualMachines/myVM/extensions/CustomScriptExtension",
+  "instanceView": null,
+  "location": "eastus",
+  "name": "CustomScriptExtension",
+  "protectedSettings": null,
+  "provisioningState": "Succeeded",
+  "publisher": "Microsoft.Compute",
+  "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+  "settings": {
+    "fileUris": [
+      "https://raw.githubusercontent.com/MicrosoftDocs/mslearn-welcome-to-azure/master/configure-iis.ps1"
+    ]
+  },
+  "tags": null,
+  "type": "Microsoft.Compute/virtualMachines/extensions",
+  "typeHandlerVersion": "1.9",
+  "virtualMachineExtensionType": "CustomScriptExtension"
+}
+sachin@Azure:~$ ^C
+sachin@Azure:~$ az vm open-port \
+>   --name myVM \
+>   --resource-group Learn-87a26c67-081a-4a3b-942c-c301adad1e94 \
+>   --port 80
+{
+  "defaultSecurityRules": [
+    {
+      "access": "Allow",
+      "description": "Allow inbound traffic from all VMs in VNET",
+      "destinationAddressPrefix": "VirtualNetwork",
+      "destinationAddressPrefixes": [],
+      "destinationApplicationSecurityGroups": null,
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"4e882ef8-6793-48c6-b727-ea5ef2850b66\"",
+      "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Network/networkSecurityGroups/myVMNSG/defaultSecurityRules/AllowVnetInBound",
+      "name": "AllowVnetInBound",
+      "priority": 65000,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+      "sourceAddressPrefix": "VirtualNetwork",
+      "sourceAddressPrefixes": [],
+      "sourceApplicationSecurityGroups": null,
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Allow",
+      "description": "Allow inbound traffic from azure load balancer",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationApplicationSecurityGroups": null,
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"4e882ef8-6793-48c6-b727-ea5ef2850b66\"",
+      "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Network/networkSecurityGroups/myVMNSG/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+      "name": "AllowAzureLoadBalancerInBound",
+      "priority": 65001,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+      "sourceAddressPrefix": "AzureLoadBalancer",
+      "sourceAddressPrefixes": [],
+      "sourceApplicationSecurityGroups": null,
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Deny",
+      "description": "Deny all inbound traffic",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationApplicationSecurityGroups": null,
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"4e882ef8-6793-48c6-b727-ea5ef2850b66\"",
+      "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Network/networkSecurityGroups/myVMNSG/defaultSecurityRules/DenyAllInBound",
+      "name": "DenyAllInBound",
+      "priority": 65500,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourceApplicationSecurityGroups": null,
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Allow",
+      "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+      "destinationAddressPrefix": "VirtualNetwork",
+      "destinationAddressPrefixes": [],
+      "destinationApplicationSecurityGroups": null,
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Outbound",
+      "etag": "W/\"4e882ef8-6793-48c6-b727-ea5ef2850b66\"",
+      "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Network/networkSecurityGroups/myVMNSG/defaultSecurityRules/AllowVnetOutBound",
+      "name": "AllowVnetOutBound",
+      "priority": 65000,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+      "sourceAddressPrefix": "VirtualNetwork",
+      "sourceAddressPrefixes": [],
+      "sourceApplicationSecurityGroups": null,
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Allow",
+      "description": "Allow outbound traffic from all VMs to Internet",
+      "destinationAddressPrefix": "Internet",
+      "destinationAddressPrefixes": [],
+      "destinationApplicationSecurityGroups": null,
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Outbound",
+      "etag": "W/\"4e882ef8-6793-48c6-b727-ea5ef2850b66\"",
+      "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Network/networkSecurityGroups/myVMNSG/defaultSecurityRules/AllowInternetOutBound",
+      "name": "AllowInternetOutBound",
+      "priority": 65001,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourceApplicationSecurityGroups": null,
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Deny",
+      "description": "Deny all outbound traffic",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationApplicationSecurityGroups": null,
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Outbound",
+      "etag": "W/\"4e882ef8-6793-48c6-b727-ea5ef2850b66\"",
+      "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Network/networkSecurityGroups/myVMNSG/defaultSecurityRules/DenyAllOutBound",
+      "name": "DenyAllOutBound",
+      "priority": 65500,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourceApplicationSecurityGroups": null,
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    }
+  ],
+  "etag": "W/\"4e882ef8-6793-48c6-b727-ea5ef2850b66\"",
+  "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Network/networkSecurityGroups/myVMNSG",
+  "location": "eastus",
+  "name": "myVMNSG",
+  "networkInterfaces": [
+    {
+      "dnsSettings": null,
+      "enableAcceleratedNetworking": null,
+      "enableIpForwarding": null,
+      "etag": null,
+      "hostedWorkloads": null,
+      "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Network/networkInterfaces/myVMVMNic",
+      "ipConfigurations": null,
+      "location": null,
+      "macAddress": null,
+      "name": null,
+      "networkSecurityGroup": null,
+      "primary": null,
+      "privateEndpoint": null,
+      "provisioningState": null,
+      "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+      "resourceGuid": null,
+      "tags": null,
+      "tapConfigurations": null,
+      "type": null,
+      "virtualMachine": null
+    }
+  ],
+  "provisioningState": "Succeeded",
+  "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+  "resourceGuid": "dec220cd-3dc0-4875-9a3c-bec95d19a850",
+  "securityRules": [
+    {
+      "access": "Allow",
+      "description": null,
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationApplicationSecurityGroups": null,
+      "destinationPortRange": "3389",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"4e882ef8-6793-48c6-b727-ea5ef2850b66\"",
+      "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Network/networkSecurityGroups/myVMNSG/securityRules/rdp",
+      "name": "rdp",
+      "priority": 1000,
+      "protocol": "Tcp",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourceApplicationSecurityGroups": null,
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/securityRules"
+    },
+    {
+      "access": "Allow",
+      "description": null,
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationApplicationSecurityGroups": null,
+      "destinationPortRange": "80",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"4e882ef8-6793-48c6-b727-ea5ef2850b66\"",
+      "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Network/networkSecurityGroups/myVMNSG/securityRules/open-port-80",
+      "name": "open-port-80",
+      "priority": 900,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourceApplicationSecurityGroups": null,
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/securityRules"
+    }
+  ],
+  "subnets": null,
+  "tags": {},
+  "type": "Microsoft.Network/networkSecurityGroups"
+}
+sachin@Azure:~$ ^C
+sachin@Azure:~$ az vm show \
+>   --name myVM \
+>   --resource-group Learn-87a26c67-081a-4a3b-942c-c301adad1e94 \
+>   --show-details \
+>   --query [publicIps] \
+>   --output tsv
+138.91.125.212
+
+sachin@Azure:~$ az vm resize \
+>   --resource-group Learn-87a26c67-081a-4a3b-942c-c301adad1e94 \
+>   --name myVM \
+>   --size Standard_DS3_v2
+{
+  "additionalCapabilities": null,
+  "availabilitySet": null,
+  "diagnosticsProfile": null,
+  "hardwareProfile": {
+    "vmSize": "Standard_DS3_v2"
+  },
+  "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Compute/virtualMachines/myVM",
+  "identity": null,
+  "instanceView": null,
+  "licenseType": null,
+  "location": "eastus",
+  "name": "myVM",
+  "networkProfile": {
+    "networkInterfaces": [
+      {
+        "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Network/networkInterfaces/myVMVMNic",
+        "primary": null,
+        "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94"
+      }
+    ]
+  },
+  "osProfile": {
+    "adminPassword": null,
+    "adminUsername": "azureuser",
+    "allowExtensionOperations": true,
+    "computerName": "myVM",
+    "customData": null,
+    "linuxConfiguration": null,
+    "requireGuestProvisionSignal": true,
+    "secrets": [],
+    "windowsConfiguration": {
+      "additionalUnattendContent": null,
+      "enableAutomaticUpdates": true,
+      "provisionVmAgent": true,
+      "timeZone": null,
+      "winRm": null
+    }
+  },
+  "plan": null,
+  "provisioningState": "Succeeded",
+  "proximityPlacementGroup": null,
+  "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+  "resources": [
+    {
+      "autoUpgradeMinorVersion": true,
+      "forceUpdateTag": null,
+      "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Compute/virtualMachines/myVM/extensions/CustomScriptExtension",
+      "instanceView": null,
+      "location": "eastus",
+      "name": "CustomScriptExtension",
+      "protectedSettings": null,
+      "provisioningState": "Succeeded",
+      "publisher": "Microsoft.Compute",
+      "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+      "settings": {
+        "fileUris": [
+          "https://raw.githubusercontent.com/MicrosoftDocs/mslearn-welcome-to-azure/master/configure-iis.ps1"
+        ]
+      },
+      "tags": null,
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "typeHandlerVersion": "1.9",
+      "virtualMachineExtensionType": "CustomScriptExtension"
+    }
+  ],
+  "storageProfile": {
+    "dataDisks": [],
+    "imageReference": {
+      "id": null,
+      "offer": "WindowsServer",
+      "publisher": "MicrosoftWindowsServer",
+      "sku": "2019-Datacenter",
+      "version": "latest"
+    },
+    "osDisk": {
+      "caching": "ReadWrite",
+      "createOption": "FromImage",
+      "diffDiskSettings": null,
+      "diskSizeGb": 127,
+      "encryptionSettings": null,
+      "image": null,
+      "managedDisk": {
+        "id": "/subscriptions/33b0dddb-4f05-458b-ae00-cf472eedb1fe/resourceGroups/Learn-87a26c67-081a-4a3b-942c-c301adad1e94/providers/Microsoft.Compute/disks/myVM_OsDisk_1_588c3003318b43ef9b3deb2011bffca7",
+        "resourceGroup": "Learn-87a26c67-081a-4a3b-942c-c301adad1e94",
+        "storageAccountType": "Premium_LRS"
+      },
+      "name": "myVM_OsDisk_1_588c3003318b43ef9b3deb2011bffca7",
+      "osType": "Windows",
+      "vhd": null,
+      "writeAcceleratorEnabled": null
+    }
+  },
+  "tags": {},
+  "type": "Microsoft.Compute/virtualMachines",
+  "vmId": "d2711f97-6dd0-4f3f-80b7-70be54ab7b4d",
+  "zones": null
+}
+sachin@Azure:~$ az vm show \
+>   --resource-group Learn-87a26c67-081a-4a3b-942c-c301adad1e94 \
+>   --name myVM \
+>   --query "hardwareProfile" \
+>   --output tsv
+Standard_DS3_v2
+sachin@Azure:~$
